@@ -39,7 +39,7 @@ dependencies:
   flutter_rounded_date_picker: ^3.0.2
   intl: ^0.18.0
   fl_chart: ^0.61.0
-  mockito: ^5.4.0
+  mocktail: ^0.3.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2

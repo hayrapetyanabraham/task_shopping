@@ -46,6 +46,13 @@ class ShoppingViewModel extends Cubit<ShoppingState> {
     }
   }
 
+  void filterItems(String query) {
+    final filteredItems = currentShoppingItems
+        .where((item) => item.name.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    emit(ShoppingLoaded(filteredItems));
+  }
+
   Future<void> updateShoppingItem(ShoppingItem item) async {
     try {
       emit(ShoppingLoading());

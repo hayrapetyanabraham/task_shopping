@@ -16,6 +16,8 @@ class ShoppingPage extends StatefulWidget {
 }
 
 class _ShoppingPageState extends State<ShoppingPage> {
+  final TextEditingController _filterController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -48,54 +50,73 @@ class _ShoppingPageState extends State<ShoppingPage> {
           )
         ],
       ),
-      body: BlocBuilder<ShoppingViewModel, ShoppingState>(
-        builder: (context, state) {
-          if (state is ShoppingLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is ShoppingLoaded) {
-            final items = state.items;
-            return ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return Card(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: ListTile(
-                    title: Text(item.name),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Price: \$${item.price}'),
-                        Text('Quantity: ${item.quantity}'),
-                        Text(
-                            'Warranty period: ${DateFormat.yMMMd().format(item.warrantyPeriod)}'),
-                        Text(
-                            'Purchase time: ${DateFormat.yMMMd().format(item.purchaseTime)}'),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        context
-                            .read<ShoppingViewModel>()
-                            .deleteShoppingItem(item.id);
-                      },
-                    ),
-                  ),
-                );
-              },
-            );
-          } else if (state is ShoppingError) {
-            return Center(
-              child: Text(
-                'An error occurred: ${state.message}',
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _filterController,
+              decoration: const InputDecoration(
+                labelText: 'Filter items...',
+                border: OutlineInputBorder(),
               ),
-            );
-          } else {
-            return Container();
-          }
-        },
+              onChanged: (value) {
+                context.read<ShoppingViewModel>().filterItems(value);
+              },
+            ),
+          ),
+          Expanded(
+            child: BlocBuilder<ShoppingViewModel, ShoppingState>(
+              builder: (context, state) {
+                if (state is ShoppingLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is ShoppingLoaded) {
+                  final items = state.items;
+                  return ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
+                        child: ListTile(
+                          title: Text(item.name),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Price: \$${item.price}'),
+                              Text('Quantity: ${item.quantity}'),
+                              Text(
+                                  'Warranty period: ${DateFormat.yMMMd().format(item.warrantyPeriod)}'),
+                              Text(
+                                  'Purchase time: ${DateFormat.yMMMd().format(item.purchaseTime)}'),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              context
+                                  .read<ShoppingViewModel>()
+                                  .deleteShoppingItem(item.id);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else if (state is ShoppingError) {
+                  return Center(
+                    child: Text(
+                      'An error occurred: ${state.message}',
+                    ),
+                  );
+                } else {
+                  return Container();
+                }
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
